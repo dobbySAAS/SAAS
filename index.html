@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HACCPro — Registres réglementaires pour restaurateurs</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+:root{--bg:#f8f9fa;--white:#fff;--border:#e9ecef;--border2:#dee2e6;--dark:#212529;--accent:#0d6efd;--accent-l:rgba(13,110,253,.08);--green:#198754;--green-l:rgba(25,135,84,.08);--red:#dc3545;--red-l:rgba(220,53,69,.08);--orange:#fd7e14;--orange-l:rgba(253,126,20,.08);--text:#212529;--muted:#6c757d;--radius:10px;--shadow:0 1px 3px rgba(0,0,0,.08);--shadow-md:0 4px 16px rgba(0,0,0,.08)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:58px;background:var(--white);border-bottom:1px solid var(--border);box-shadow:var(--shadow)}
+.logo{font-size:1.1rem;font-weight:800;letter-spacing:-.02em;cursor:pointer;display:flex;align-items:center;gap:7px}
+.logo-icon{background:var(--accent);color:#fff;width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:800}
+.logo span{color:var(--accent)}
+.nav-r{display:flex;align-items:center;gap:8px}
+.nav-user{font-size:.75rem;color:var(--muted);font-family:'DM Mono',monospace;display:none}
+.btn-nav{background:var(--accent);color:#fff;border:none;padding:7px 16px;border-radius:7px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.83rem;font-weight:700;cursor:pointer}
+.btn-nav-out{background:transparent;border:1px solid var(--border2);color:var(--muted);padding:6px 12px;border-radius:7px;font-size:.78rem;cursor:pointer;display:none}
+.page{display:none;padding-top:58px;min-height:100vh}
+.page.active{display:block}
+
+/* LANDING */
+.hero-wrap{background:var(--white);border-bottom:1px solid var(--border)}
+.hero{max-width:1060px;margin:0 auto;padding:64px 28px 72px;display:grid;grid-template-columns:1fr 400px;gap:56px;align-items:center}
+.hero-tag{display:inline-flex;align-items:center;gap:6px;background:var(--red-l);color:var(--red);border:1px solid rgba(220,53,69,.15);border-radius:5px;padding:4px 10px;font-size:.7rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin-bottom:16px}
+.hero h1{font-size:clamp(1.9rem,3.8vw,2.9rem);font-weight:800;line-height:1.1;letter-spacing:-.03em;margin-bottom:16px}
+.hero h1 .hl{color:var(--accent)}
+.hero-sub{font-size:.93rem;color:var(--muted);line-height:1.7;margin-bottom:28px;max-width:460px}
+.hero-btns{display:flex;gap:10px;flex-wrap:wrap}
+.btn-hero{background:var(--accent);color:#fff;border:none;padding:12px 24px;border-radius:var(--radius);font-family:'Plus Jakarta Sans',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer}
+.btn-hero-sec{background:#fff;color:var(--dark);border:1px solid var(--border2);padding:11px 20px;border-radius:var(--radius);font-family:'Plus Jakarta Sans',sans-serif;font-size:.86rem;cursor:pointer}
+.hero-card{background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow-md);overflow:hidden}
+.hc-head{background:var(--red);color:#fff;padding:12px 16px}
+.hc-head-t{font-weight:700;font-size:.85rem}
+.hc-head-s{font-size:.72rem;opacity:.8}
+.hc-body{padding:14px}
+.hc-item{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border)}
+.hc-item:last-child{border-bottom:none}
+.hc-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dot-g{background:var(--green)}.dot-o{background:var(--orange)}
+.hc-lbl{font-size:.8rem;font-weight:600;flex:1}
+.hc-val{font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted)}
+.hc-st{font-size:.68rem;font-weight:600;padding:2px 6px;border-radius:3px}
+.st-ok{background:var(--green-l);color:var(--green)}
+.st-w{background:var(--orange-l);color:var(--orange)}
+.stats-bar{background:var(--dark)}
+.stats-inner{max-width:1060px;margin:0 auto;padding:0 28px;display:grid;grid-template-columns:repeat(4,1fr)}
+.sbi{padding:22px 16px;text-align:center;border-right:1px solid rgba(255,255,255,.07)}
+.sbi:last-child{border-right:none}
+.sbn{font-size:1.7rem;font-weight:800;color:var(--accent);letter-spacing:-.04em;display:block;font-family:'DM Mono',monospace}
+.sbl{font-size:.68rem;color:rgba(255,255,255,.45);margin-top:2px}
+.land-sec{max-width:1060px;margin:0 auto;padding:56px 28px}
+.sec-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.sec-title{font-size:1.6rem;font-weight:800;letter-spacing:-.02em;margin-bottom:28px}
+.feats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.feat-c{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+.feat-ic{font-size:1.5rem;margin-bottom:10px;display:block}
+.feat-t{font-size:.88rem;font-weight:700;margin-bottom:4px}
+.feat-d{font-size:.75rem;color:var(--muted);line-height:1.5}
+.steps-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.step-c{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+.step-n{font-family:'DM Mono',monospace;font-size:.6rem;color:var(--accent);letter-spacing:.1em;margin-bottom:6px}
+.step-ic{font-size:1.3rem;margin-bottom:7px;display:block}
+.step-t{font-size:.85rem;font-weight:700;margin-bottom:3px}
+.step-d{font-size:.73rem;color:var(--muted);line-height:1.4}
+.price-wrap{max-width:440px}
+.price-c{background:var(--white);border:2px solid var(--accent);border-radius:14px;padding:28px;box-shadow:var(--shadow-md)}
+.price-n{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.price-a{font-size:2.6rem;font-weight:800;letter-spacing:-.04em;line-height:1;font-family:'DM Mono',monospace;margin-bottom:2px}
+.price-p{font-size:.7rem;color:var(--muted);margin-bottom:18px}
+.price-list{list-style:none;display:flex;flex-direction:column;gap:7px}
+.price-list li{font-size:.82rem;color:#444;display:flex;align-items:center;gap:7px}
+.ck{color:var(--green);font-weight:700}
+.cta-band{background:var(--accent);border-radius:14px;padding:48px;text-align:center;color:#fff}
+.cta-band h2{font-size:1.7rem;font-weight:800;letter-spacing:-.02em;margin-bottom:8px}
+.cta-band p{color:rgba(255,255,255,.7);font-size:.9rem;margin-bottom:24px;line-height:1.6}
+.btn-cta-w{background:#fff;color:var(--accent);border:none;padding:13px 28px;border-radius:var(--radius);font-family:'Plus Jakarta Sans',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer}
+
+/* FOOTER */
+footer{background:var(--dark);color:rgba(255,255,255,.7);padding:40px 28px}
+.footer-inner{max-width:1060px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr 1fr;gap:32px}
+.footer-brand{font-size:1.1rem;font-weight:800;color:#fff;margin-bottom:8px;display:flex;align-items:center;gap:7px}
+.footer-brand-icon{background:var(--accent);color:#fff;width:24px;height:24px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:.75rem}
+.footer-brand span{color:var(--accent)}
+.footer-desc{font-size:.78rem;line-height:1.6;color:rgba(255,255,255,.5)}
+.footer-title{font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:12px}
+.footer-links{display:flex;flex-direction:column;gap:8px}
+.footer-links a{color:rgba(255,255,255,.65);text-decoration:none;font-size:.82rem;display:flex;align-items:center;gap:8px}
+.footer-links a:hover{color:#fff}
+.footer-bottom{max-width:1060px;margin:24px auto 0;padding-top:18px;border-top:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-between;font-size:.72rem;color:rgba(255,255,255,.3)}
+
+/* LOGIN */
+.login-outer{max-width:380px;margin:0 auto;padding:48px 20px}
+.login-card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:34px;box-shadow:var(--shadow-md)}
+.login-logo{text-align:center;margin-bottom:5px;font-size:1.35rem;font-weight:800}
+.login-logo span{color:var(--accent)}
+.login-sub{text-align:center;color:var(--muted);font-size:.8rem;margin-bottom:24px}
+.fld{margin-bottom:13px}
+.fld label{display:block;font-size:.7rem;font-weight:600;color:var(--muted);margin-bottom:4px}
+.fld input{width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:7px;padding:10px 12px;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-size:.88rem}
+.fld input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(13,110,253,.1)}
+.fld input::placeholder{color:#adb5bd}
+.btn-submit{width:100%;background:var(--accent);color:#fff;border:none;padding:12px;border-radius:var(--radius);font-family:'Plus Jakarta Sans',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;margin-top:4px}
+.lerr{color:var(--red);font-size:.76rem;text-align:center;margin-top:8px;display:none}
+.back-lnk{text-align:center;margin-top:12px}
+.back-lnk button{background:none;border:none;color:var(--muted);font-size:.76rem;cursor:pointer;text-decoration:underline}
+
+/* ADMIN */
+.awrap{max-width:1060px;margin:0 auto;padding:26px 22px}
+.pg-hd{margin-bottom:22px}
+.pg-title{font-size:1.35rem;font-weight:800;letter-spacing:-.02em;margin-bottom:2px}
+.pg-sub{color:var(--muted);font-size:.8rem}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.kpi{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+.kpi-l{font-size:.68rem;font-weight:600;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin-bottom:5px}
+.kpi-v{font-size:1.7rem;font-weight:800;color:var(--accent);letter-spacing:-.04em;font-family:'DM Mono',monospace}
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px}
+.card-top{padding:13px 18px;border-bottom:1px solid var(--border);font-weight:700;font-size:.86rem}
+.tbl-h{display:grid;grid-template-columns:1.4fr 1.2fr .8fr auto;gap:10px;padding:8px 18px;background:var(--bg);font-size:.65rem;font-weight:600;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid var(--border)}
+.tbl-r{display:grid;grid-template-columns:1.4fr 1.2fr .8fr auto;gap:10px;padding:12px 18px;border-bottom:1px solid var(--border);align-items:center}
+.tbl-r:last-child{border-bottom:none}
+.tbl-r:hover{background:var(--bg)}
+.tr-name{font-weight:700;font-size:.85rem}
+.tr-creds{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted)}
+.plan-b{font-size:.62rem;font-weight:700;padding:2px 7px;border-radius:4px;font-family:'DM Mono',monospace;background:var(--accent-l);color:var(--accent)}
+.btn-rm{background:transparent;border:1px solid var(--border2);color:var(--muted);padding:3px 9px;border-radius:5px;font-size:.68rem;cursor:pointer}
+.btn-rm:hover{border-color:var(--red);color:var(--red)}
+.empty-r{padding:28px;text-align:center;color:var(--muted);font-size:.8rem}
+.add-form{padding:16px 18px;display:grid;grid-template-columns:1.4fr 1fr 1fr auto;gap:10px;align-items:end}
+.aff label{display:block;font-size:.68rem;font-weight:600;color:var(--muted);margin-bottom:3px}
+.aff input{width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:8px 10px;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-size:.83rem}
+.aff input:focus{outline:none;border-color:var(--accent)}
+.btn-add{background:var(--accent);color:#fff;border:none;padding:8px 16px;border-radius:7px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.83rem;font-weight:700;cursor:pointer;white-space:nowrap}
+
+/* APP */
+.app-outer{max-width:800px;margin:0 auto;padding:22px 18px}
+.tabs{display:flex;gap:2px;background:var(--border);border-radius:9px;padding:3px;margin-bottom:20px;overflow-x:auto}
+.tab{flex:none;padding:8px 12px;text-align:center;font-size:.78rem;font-weight:600;border-radius:6px;cursor:pointer;color:var(--muted);white-space:nowrap}
+.tab.active{background:var(--white);color:var(--text);box-shadow:var(--shadow)}
+.tab-pane{display:none}
+.tab-pane.active{display:block;animation:fadeUp .2s ease both}
+.welcome{margin-bottom:18px}
+.welcome h2{font-size:1.25rem;font-weight:800;letter-spacing:-.02em;margin-bottom:2px}
+.welcome p{color:var(--muted);font-size:.8rem}
+.ckpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.ckpi{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow)}
+.ckpi-l{font-size:.65rem;font-weight:600;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin-bottom:5px}
+.ckpi-v{font-size:1.5rem;font-weight:800;letter-spacing:-.03em;font-family:'DM Mono',monospace}
+.ckpi-s{font-size:.7rem;color:var(--muted);margin-top:1px}
+.cv-blue{color:var(--accent)}.cv-green{color:var(--green)}.cv-orange{color:var(--orange)}
+.reg-summary{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+.rs-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);display:flex;align-items:center;gap:10px;cursor:pointer;transition:border-color .15s}
+.rs-card:hover{border-color:var(--accent)}
+.rs-icon{font-size:1.4rem}
+.rs-title{font-size:.85rem;font-weight:700;margin-bottom:2px}
+.rs-count{font-size:.72rem;color:var(--muted)}
+.rs-arrow{margin-left:auto;color:var(--muted)}
+.hist-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:14px}
+.hc-top{padding:12px 16px;border-bottom:1px solid var(--border);font-weight:700;font-size:.85rem}
+.hc-row{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.hc-row:last-child{border-bottom:none}
+.hc-title{font-weight:600;font-size:.82rem;margin-bottom:1px}
+.hc-date{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted)}
+.hc-badge{font-size:.65rem;font-weight:600;padding:2px 7px;border-radius:4px}
+.hcb-ok{background:var(--green-l);color:var(--green)}
+.hcb-w{background:var(--orange-l);color:var(--orange)}
+.form-section{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:12px}
+.fs-head{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;background:var(--bg)}
+.fs-icon{font-size:1rem}
+.fs-title{font-weight:700;font-size:.87rem}
+.fs-badge{font-family:'DM Mono',monospace;font-size:.6rem;padding:2px 6px;border-radius:3px;background:var(--red-l);color:var(--red);margin-left:auto}
+.fs-body{padding:14px 16px;display:grid;gap:10px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fg{display:flex;flex-direction:column;gap:3px}
+.fg label{font-size:.7rem;font-weight:600;color:var(--muted)}
+.fg label span{font-size:.62rem;color:var(--green);margin-left:4px}
+.fg input,.fg select,.fg textarea{background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:8px 11px;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-size:.83rem;width:100%}
+.fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--accent)}
+.fg textarea{resize:vertical;min-height:65px}
+.t-ok{border-color:var(--green)!important;background:var(--green-l)!important}
+.t-w{border-color:var(--orange)!important;background:var(--orange-l)!important}
+.t-bad{border-color:var(--red)!important;background:var(--red-l)!important}
+.check-list{display:flex;flex-direction:column;gap:7px}
+.chk-item{display:flex;align-items:center;gap:9px;padding:9px 11px;border:1px solid var(--border);border-radius:7px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.chk-item.on{border-color:var(--green);background:var(--green-l)}
+.chk-box{width:17px;height:17px;border:2px solid var(--border2);border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.7rem}
+.chk-item.on .chk-box{background:var(--green);border-color:var(--green);color:#fff}
+.chk-lbl{font-size:.83rem;font-weight:500}
+.date-bar{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow)}
+.date-lbl{font-size:.75rem;font-weight:600;color:var(--muted)}
+.date-val{font-family:'DM Mono',monospace;font-size:.88rem;font-weight:600}
+.form-actions{display:flex;gap:10px;margin-top:18px}
+.btn-save{background:var(--accent);color:#fff;border:none;padding:12px 24px;border-radius:var(--radius);font-family:'Plus Jakarta Sans',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;flex:1}
+.btn-pdf{background:var(--green);color:#fff;border:none;padding:12px 18px;border-radius:var(--radius);font-family:'Plus Jakarta Sans',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--dark);color:#fff;padding:11px 18px;border-radius:9px;font-size:.82rem;font-weight:500;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:660px){
+nav{padding:0 14px}
+.hero{grid-template-columns:1fr;padding:36px 16px;gap:0}
+.hero-card{display:none}
+.stats-inner{grid-template-columns:1fr 1fr}
+.feats-grid,.steps-row{grid-template-columns:1fr 1fr}
+.kpis{grid-template-columns:1fr 1fr}
+.add-form{grid-template-columns:1fr}
+.tbl-h,.tbl-r{grid-template-columns:1fr 1fr auto}
+.ckpis{grid-template-columns:1fr 1fr}
+.reg-summary{grid-template-columns:1fr}
+.form-row{grid-template-columns:1fr}
+.footer-inner{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<nav>
+<div class="logo" onclick="goHome()"><div class="logo-icon">H</div>HACCP<span>ro</span></div>
+<div class="nav-r">
+<span class="nav-user" id="nav-user"></span>
+<button class="btn-nav" id="btn-login" onclick="showPage('login')">Se connecter</button>
+<button class="btn-nav-out" id="btn-logout" onclick="logout()">Déconnexion</button>
+</div>
+</nav>
+<div class="toast" id="toast"></div>
+
+<!-- LANDING -->
+<div class="page active" id="page-landing">
+<div class="hero-wrap">
+<div class="hero">
+<div>
+<div class="hero-tag">⚠ Obligation légale quotidienne — HACCP</div>
+<h1>Vos registres<br><span class="hl">réglementaires</span><br>en 2 minutes</h1>
+<p class="hero-sub">HACCP, incendie, accidents, formations — tous vos registres obligatoires digitalisés. Sauvegardés en ligne, exportables en PDF, accessibles depuis n'importe quel appareil.</p>
+<div class="hero-btns">
+<button class="btn-hero" onclick="showPage('login')">Accéder à mon espace →</button>
+<button class="btn-hero-sec" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">Voir les fonctionnalités</button>
+</div>
+</div>
+<div class="hero-card">
+<div class="hc-head"><div class="hc-head-t">📋 Registre du jour</div><div class="hc-head-s">Pizzeria Napoli · Aujourd'hui</div></div>
+<div class="hc-body">
+<div class="hc-item"><div class="hc-dot dot-g"></div><div class="hc-lbl">🌡 Frigo viandes</div><div class="hc-val">3.2°C</div><span class="hc-st st-ok">✓ OK</span></div>
+<div class="hc-item"><div class="hc-dot dot-g"></div><div class="hc-lbl">❄️ Congélateur</div><div class="hc-val">-19°C</div><span class="hc-st st-ok">✓ OK</span></div>
+<div class="hc-item"><div class="hc-dot dot-o"></div><div class="hc-lbl">🌡 Frigo boissons</div><div class="hc-val">8.1°C</div><span class="hc-st st-w">⚠ Surveiller</span></div>
+<div class="hc-item"><div class="hc-dot dot-g"></div><div class="hc-lbl">🧼 Nettoyage</div><div class="hc-val">8h30</div><span class="hc-st st-ok">✓ Fait</span></div>
+<div class="hc-item"><div class="hc-dot dot-g"></div><div class="hc-lbl">📦 Livraison</div><div class="hc-val">Conforme</div><span class="hc-st st-ok">✓ OK</span></div>
+</div>
+</div>
+</div>
+</div>
+<div class="stats-bar">
+<div class="stats-inner">
+<div class="sbi"><span class="sbn">500K+</span><span class="sbl">établissements concernés</span></div>
+<div class="sbi"><span class="sbn">2'</span><span class="sbl">par registre quotidien</span></div>
+<div class="sbi"><span class="sbn">4</span><span class="sbl">registres inclus</span></div>
+<div class="sbi"><span class="sbn">49€</span><span class="sbl">par mois tout inclus</span></div>
+</div>
+</div>
+<div class="land-sec" id="features">
+<div class="sec-label">Fonctionnalités</div>
+<div class="sec-title">Tout ce dont vous avez besoin</div>
+<div class="feats-grid">
+<div class="feat-c"><span class="feat-ic">🌡</span><div class="feat-t">Registre HACCP quotidien</div><div class="feat-d">Températures, nettoyage, livraisons, hygiène du personnel. Alertes automatiques hors normes.</div></div>
+<div class="feat-c"><span class="feat-ic">🔥</span><div class="feat-t">Sécurité incendie</div><div class="feat-d">Vérification extincteurs, issues de secours, exercices d'évacuation. Suivi mensuel simplifié.</div></div>
+<div class="feat-c"><span class="feat-ic">🩹</span><div class="feat-t">Accidents du travail</div><div class="feat-d">Déclaration et suivi des incidents. Conforme au Code du travail.</div></div>
+<div class="feat-c"><span class="feat-ic">🎓</span><div class="feat-t">Registre des formations</div><div class="feat-d">Suivi des formations obligatoires du personnel. Alertes d'expiration.</div></div>
+<div class="feat-c"><span class="feat-ic">📄</span><div class="feat-t">Export PDF automatique</div><div class="feat-d">Chaque registre exportable en PDF conforme. Prêt pour l'inspection.</div></div>
+<div class="feat-c"><span class="feat-ic">☁️</span><div class="feat-t">Sauvegarde en ligne</div><div class="feat-d">Données sauvegardées sur le cloud. Accès depuis n'importe quel appareil.</div></div>
+</div>
+</div>
+<div class="land-sec">
+<div class="sec-label">Comment ça marche</div>
+<div class="sec-title">Simple et rapide</div>
+<div class="steps-row">
+<div class="step-c"><div class="step-n">01</div><span class="step-ic">🔐</span><div class="step-t">Connexion</div><div class="step-d">Accédez depuis n'importe quel appareil, à tout moment.</div></div>
+<div class="step-c"><div class="step-n">02</div><span class="step-ic">📝</span><div class="step-t">Remplissez</div><div class="step-d">Choisissez le registre et saisissez en 2 minutes.</div></div>
+<div class="step-c"><div class="step-n">03</div><span class="step-ic">☁️</span><div class="step-t">Sauvegardé</div><div class="step-d">Enregistrement automatique en ligne, accessible partout.</div></div>
+<div class="step-c"><div class="step-n">04</div><span class="step-ic">📄</span><div class="step-t">PDF en un clic</div><div class="step-d">Téléchargez le registre conforme pour l'inspection.</div></div>
+</div>
+</div>
+<div class="land-sec">
+<div class="sec-label">Tarif</div>
+<div class="sec-title">Tout inclus, sans surprise</div>
+<div class="price-wrap">
+<div class="price-c">
+<div class="price-n">Abonnement complet</div>
+<div class="price-a">49€</div>
+<div class="price-p">/mois · sans engagement · résiliable à tout moment</div>
+<ul class="price-list">
+<li><span class="ck">✓</span> Registre HACCP quotidien illimité</li>
+<li><span class="ck">✓</span> Registre sécurité incendie</li>
+<li><span class="ck">✓</span> Registre accidents du travail</li>
+<li><span class="ck">✓</span> Registre des formations</li>
+<li><span class="ck">✓</span> Export PDF de tous les registres</li>
+<li><span class="ck">✓</span> Historique complet en ligne</li>
+<li><span class="ck">✓</span> Accès multi-appareils</li>
+<li><span class="ck">✓</span> Support par email</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="land-sec">
+<div class="cta-band">
+<h2>Mettez-vous en conformité<br>dès aujourd'hui</h2>
+<p>Premier mois offert. Aucune carte bancaire requise.<br>Tous vos registres conformes en 2 minutes.</p>
+<button class="btn-cta-w" onclick="showPage('login')">Commencer gratuitement →</button>
+</div>
+</div>
+<footer>
+<div class="footer-inner">
+<div>
+<div class="footer-brand"><div class="footer-brand-icon">H</div>HACCP<span>ro</span></div>
+<p class="footer-desc">L'outil de registres réglementaires pour les restaurateurs, boulangers et traiteurs. Conforme, simple, accessible partout.</p>
+</div>
+<div>
+<div class="footer-title">Contact</div>
+<div class="footer-links">
+<a href="mailto:varandasalessandro.22@gmail.com">📧 varandasalessandro.22@gmail.com</a>
+<a href="tel:+330615311693">📞 Nous appeler</a>
+</div>
+</div>
+<div>
+<div class="footer-title">Légal</div>
+<div class="footer-links">
+<a href="#">Mentions légales</a>
+<a href="#">Politique de confidentialité</a>
+<a href="#">CGV</a>
+</div>
+</div>
+</div>
+<div class="footer-bottom">
+<span>© 2025 HACCPro — Tous droits réservés</span>
+<span>Fait avec ❤ en France</span>
+</div>
+</footer>
+</div>
+
+<!-- LOGIN -->
+<div class="page" id="page-login">
+<div class="login-outer">
+<div class="login-card">
+<div class="login-logo">HACCP<span>ro</span></div>
+<div class="login-sub">Connectez-vous à votre espace</div>
+<div class="fld"><label>Identifiant</label><input type="text" id="lu" placeholder="votre identifiant" autocomplete="username"></div>
+<div class="fld"><label>Mot de passe</label><input type="password" id="lp" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+<button class="btn-submit" onclick="doLogin()">Se connecter →</button>
+<div class="lerr" id="lerr">Identifiant ou mot de passe incorrect</div>
+</div>
+<div class="back-lnk"><button onclick="showPage('landing')">← Retour à l'accueil</button></div>
+</div>
+</div>
+
+<!-- ADMIN -->
+<div class="page" id="page-admin">
+<div class="awrap">
+<div class="pg-hd"><div class="pg-title">⚙ Dashboard Admin</div><div class="pg-sub">Gérez vos clients HACCPro</div></div>
+<div class="kpis">
+<div class="kpi"><div class="kpi-l">Clients actifs</div><div class="kpi-v" id="k1">–</div></div>
+<div class="kpi"><div class="kpi-l">Revenu mensuel</div><div class="kpi-v" id="k2">–</div></div>
+<div class="kpi"><div class="kpi-l">Revenu annuel</div><div class="kpi-v" id="k3">–</div></div>
+<div class="kpi"><div class="kpi-l">Registres ce mois</div><div class="kpi-v" id="k4">–</div></div>
+</div>
+<div class="card">
+<div class="card-top">Liste des clients</div>
+<div class="tbl-h"><span>Établissement</span><span>Identifiant / MDP</span><span>Plan</span><span>Action</span></div>
+<div id="clients-list"><div class="empty-r">Chargement…</div></div>
+</div>
+<div class="card">
+<div class="card-top">➕ Ajouter un client</div>
+<div class="add-form">
+<div class="aff"><label>Nom établissement</label><input type="text" id="new-name" placeholder="Pizzeria Napoli"></div>
+<div class="aff"><label>Identifiant</label><input type="text" id="new-login" placeholder="napoli2025"></div>
+<div class="aff"><label>Mot de passe</label><input type="text" id="new-pass" placeholder="haccp2025!"></div>
+<button class="btn-add" onclick="addClient()">Ajouter</button>
+</div>
+</div>
+</div>
+</div>
+
+<!-- APP CLIENT -->
+<div class="page" id="page-app">
+<div class="app-outer">
+<div class="tabs">
+<div class="tab active" id="tab-home" onclick="switchTab('home')">🏠 Accueil</div>
+<div class="tab" id="tab-haccp" onclick="switchTab('haccp')">🌡 HACCP</div>
+<div class="tab" id="tab-fire" onclick="switchTab('fire')">🔥 Incendie</div>
+<div class="tab" id="tab-accident" onclick="switchTab('accident')">🩹 Accidents</div>
+<div class="tab" id="tab-training" onclick="switchTab('training')">🎓 Formations</div>
+</div>
+
+<!-- HOME -->
+<div class="tab-pane active" id="pane-home">
+<div class="welcome"><h2>Bonjour <span id="client-name" style="color:var(--accent)"></span> 👋</h2><p id="client-date"></p></div>
+<div class="ckpis">
+<div class="ckpi"><div class="ckpi-l">HACCP ce mois</div><div class="ckpi-v cv-blue" id="ck1">–</div><div class="ckpi-s">registres</div></div>
+<div class="ckpi"><div class="ckpi-l">Dernier contrôle</div><div class="ckpi-v cv-green" id="ck2" style="font-size:.95rem;padding-top:3px">–</div><div class="ckpi-s" id="ck2s">–</div></div>
+<div class="ckpi"><div class="ckpi-l">Conformité</div><div class="ckpi-v cv-green" id="ck3">–</div><div class="ckpi-s" id="ck3s">–</div></div>
+</div>
+<div class="reg-summary">
+<div class="rs-card" onclick="switchTab('haccp')"><span class="rs-icon">🌡</span><div><div class="rs-title">Registre HACCP</div><div class="rs-count" id="rs1">Quotidien obligatoire</div></div><span class="rs-arrow">→</span></div>
+<div class="rs-card" onclick="switchTab('fire')"><span class="rs-icon">🔥</span><div><div class="rs-title">Sécurité incendie</div><div class="rs-count" id="rs2">Mensuel obligatoire</div></div><span class="rs-arrow">→</span></div>
+<div class="rs-card" onclick="switchTab('accident')"><span class="rs-icon">🩹</span><div><div class="rs-title">Accidents du travail</div><div class="rs-count" id="rs3">Sur incident</div></div><span class="rs-arrow">→</span></div>
+<div class="rs-card" onclick="switchTab('training')"><span class="rs-icon">🎓</span><div><div class="rs-title">Formations</div><div class="rs-count" id="rs4">Suivi annuel</div></div><span class="rs-arrow">→</span></div>
+</div>
+<div class="hist-card">
+<div class="hc-top">📁 Derniers registres HACCP</div>
+<div id="history-list"><div class="empty-r">Aucun registre — commencez par le HACCP du jour</div></div>
+</div>
+</div>
+
+<!-- HACCP -->
+<div class="tab-pane" id="pane-haccp">
+<div class="date-bar"><div><div class="date-lbl">Registre HACCP du</div><div class="date-val" id="haccp-date"></div></div><div style="text-align:right;font-size:.72rem;color:var(--muted)">Établissement :<br><strong id="haccp-name"></strong></div></div>
+<div class="form-section">
+<div class="fs-head"><span class="fs-icon">🌡</span><span class="fs-title">Températures</span><span class="fs-badge">Obligatoire</span></div>
+<div class="fs-body">
+<div class="form-row">
+<div class="fg"><label>Frigo viandes (°C)<span>norme: 0 à 4°C</span></label><input type="number" id="t1" step="0.1" placeholder="3.2" oninput="chkT(this,0,4)"></div>
+<div class="fg"><label>Frigo légumes (°C)<span>norme: 0 à 8°C</span></label><input type="number" id="t2" step="0.1" placeholder="5.0" oninput="chkT(this,0,8)"></div>
+</div>
+<div class="form-row">
+<div class="fg"><label>Congélateur (°C)<span>norme: ≤ -18°C</span></label><input type="number" id="t3" step="0.1" placeholder="-19" oninput="chkT(this,-99,-18)"></div>
+<div class="fg"><label>Frigo boissons (°C)<span>norme: 0 à 8°C</span></label><input type="number" id="t4" step="0.1" placeholder="6.0" oninput="chkT(this,0,8)"></div>
+</div>
+<div class="fg"><label>Observations températures</label><textarea id="t-notes" placeholder="Ex: Frigo 2 légèrement chaud…"></textarea></div>
+</div>
+</div>
+<div class="form-section">
+<div class="fs-head"><span class="fs-icon">🧼</span><span class="fs-title">Nettoyage</span><span class="fs-badge">Obligatoire</span></div>
+<div class="fs-body">
+<div class="check-list">
+<div class="chk-item" onclick="tog(this,'c1')"><div class="chk-box" id="c1"></div><span class="chk-lbl">🍳 Cuisine nettoyée et désinfectée</span></div>
+<div class="chk-item" onclick="tog(this,'c2')"><div class="chk-box" id="c2"></div><span class="chk-lbl">🥄 Ustensiles et équipements</span></div>
+<div class="chk-item" onclick="tog(this,'c3')"><div class="chk-box" id="c3"></div><span class="chk-lbl">🗑 Poubelles vidées et nettoyées</span></div>
+<div class="chk-item" onclick="tog(this,'c4')"><div class="chk-box" id="c4"></div><span class="chk-lbl">🚽 Sanitaires nettoyés</span></div>
+<div class="chk-item" onclick="tog(this,'c5')"><div class="chk-box" id="c5"></div><span class="chk-lbl">🪟 Plans de travail et surfaces</span></div>
+</div>
+<div class="fg"><label>Produits utilisés / Observations</label><textarea id="c-notes" placeholder="Ex: Désinfectant Ecolab dilué 1/50…"></textarea></div>
+</div>
+</div>
+<div class="form-section">
+<div class="fs-head"><span class="fs-icon">📦</span><span class="fs-title">Livraisons</span><span class="fs-badge">Si livraison</span></div>
+<div class="fs-body">
+<div class="form-row">
+<div class="fg"><label>Fournisseur / Produits</label><input type="text" id="l1" placeholder="Metro — viandes, légumes"></div>
+<div class="fg"><label>Conformité</label><select id="l2"><option value="">— Sélectionner —</option><option>✅ Conforme</option><option>❌ Non conforme — refusée</option><option>📭 Pas de livraison</option></select></div>
+</div>
+<div class="fg"><label>Observations</label><textarea id="l-notes" placeholder="Emballages intacts, DLC vérifiées…"></textarea></div>
+</div>
+</div>
+<div class="form-section">
+<div class="fs-head"><span class="fs-icon">✍️</span><span class="fs-title">Validation</span></div>
+<div class="fs-body">
+<div class="form-row">
+<div class="fg"><label>Responsable du contrôle</label><input type="text" id="sig1" placeholder="Prénom Nom"></div>
+<div class="fg"><label>Heure de validation</label><input type="time" id="sig2"></div>
+</div>
+<div class="fg"><label>Observations générales</label><textarea id="sig3" placeholder="RAS — Tout conforme. Ou actions correctives…"></textarea></div>
+</div>
+</div>
+<div class="form-actions">
+<button class="btn-save" onclick="saveHACCP()">💾 Enregistrer</button>
+<button class="btn-pdf" onclick="pdfHACCP()">📄 PDF</button>
+</div>
+</div>
+
+<!-- INCENDIE -->
+<div class="tab-pane" id="pane-fire">
+<div class="date-bar"><div><div class="date-lbl">Registre sécurité incendie</div><div class="date-val" id="fire-date"></div></div></div>
+<div class="form-section">
+<div class="fs-head"><span class="fs-icon">🧯</span><span class="fs-title">Contrôle extincteurs</span><span class="fs-badge">Mensuel</span></div>
+<div class="fs-body">
+<div class="check-list">
+<div class="chk-item" onclick="tog(this,'f1')"><div class="chk-box" id="f1"></div><span class="chk-lbl">🧯 Extincteurs accessibles et non obstrués</span></div>
+<div class="chk-item" onclick="tog(this,'f2')"><div class="chk-box" id="f2"></div><span class="chk-lbl">📅 Date de vérification valide (moins d'1 an)</span></div>
+<div class="chk-item" onclick="tog(this,'f3')"><div class="chk-box" id="f3"></div><span class="chk-lbl">🟢 Manomètre dans le vert</span></div>
+<div class="chk-item" onclick="tog(this,'f4')"><div class="chk-box" id="f4"></div><span class="chk-lbl">🚪 Issues de secours dégagées</span></div>
+<div class="chk-item" onclick="tog(this,'f5')"><div class="chk-box" id="f5"></div><span class="chk-lbl">💡 Éclairage de sécurité fonctionnel</span></div>
+<div class="chk-item" onclick="tog(this,'f6')"><div class="chk-box" id="f6"></div><span class="chk-lbl">🗺 Plan d'évacuation affiché et lisible</span></div>
+</div>
+<div class="fg"><label>Nombre d'extincteurs vérifiés</label><input type="number" id="fire-nb" placeholder="Ex: 3" min="0"></div>
+</div>
+</div>
+<div class="form-section">
+<div class="fs-head"><span class="fs-icon">🏃</span><span class="fs-title">Exercice d'évacuation</span><span class="fs-badge">Annuel</span></div>
+<div class="fs-body">
+<div class="form-row">
+<div class="fg"><label>Date du dernier exercice</label><input type="date" id="fire-exo-date"></div>
+<div class="fg"><label>Durée d'évacuation (minutes)</label><input type="number" id="fire-exo-dur" placeholder="Ex: 3" min="0"></div>
+</div>
+<div class="fg"><label>Observations</label><textarea id="fire-notes" placeholder="RAS — Tout conforme. Ou : extincteur manquant côté cuisine…"></textarea></div>
+</div>
+</div>
+<div class="form-section">
+<div class="fs-head"><span class="fs-icon">✍️</span><span class="fs-title">Validation</span></div>
+<div class="fs-body">
+<div class="form-row">
+<div class="fg"><label>Responsable</label><input type="text" id="fire-sig" placeholder="Prénom Nom"></div>
+<div class="fg"><label>Date du contrôle</label><input type="date" id="fire-sig-date"></div>
+</div>
+</div>
+</div>
+<div class="form-actions">
+<button class="btn-save" onclick="saveFire()">💾 Enregistrer</button>
+<button class="btn-pdf" onclick="pdfFire()">📄 PDF</button>
+</div>
+</div>
+
+<!-- ACCIDENTS -->
+<div class="tab-pane" id="pane-accident">
+<div class="date-bar"><div><div class="date-lbl">Registre accidents du travail</div><div class="date-val" id="acc-date"></div></div></div>
+<div class="form-section">
+<div class="fs-head"><span class="fs-icon">🩹</span><span class="fs-title">Déclaration d'incident</span><span class="fs-badge">Sur incident</span></div>
+<div class="fs-body">
+<div class="form-row">
+<div class="fg"><label>Nom et prénom du salarié</label><input type="text" id="acc-name" placeholder="Jean Dupont"></div>
+<div class="fg"><label>Poste occupé</label><input type="text" id="acc-poste" placeholder="Cuisinier, serveur…"></div>
+</div>
+<div class="form-row">
+<div class="fg"><label>Date de l'accident</label><input type="date" id="acc-date-input"></div>
+<div class="fg"><label>Heure</label><input type="time" id="acc-time"></div>
+</div>
+<div class="fg"><label>Description de l'accident</label><textarea id="acc-desc" placeholder="Décrivez précisément ce qui s'est passé…"></textarea></div>
+<div class="form-row">
+<div class="fg"><label>Nature de la blessure</label><input type="text" id="acc-bless" placeholder="Coupure, brûlure, chute…"></div>
+<div class="fg"><label>Partie du corps touchée</label><input type="text" id="acc-corps" placeholder="Main droite, dos…"></div>
+</div>
+<div class="form-row">
+<div class="fg"><label>Soins apportés</label><select id="acc-soins"><option>Premiers secours sur place</option><option>Médecin consulté</option><option>Hospitalisation</option><option>Aucun soin nécessaire</option></select></div>
+<div class="fg"><label>Arrêt de travail</label><select id="acc-arret"><option>Non</option><option>Oui — 1 à 3 jours</option><option>Oui — plus de 3 jours</option></select></div>
+</div>
+<div class="fg"><label>Mesures correctives prises</label><textarea id="acc-mesures" placeholder="Ex: Zone sécurisée, formation planifiée…"></textarea></div>
+<div class="fg"><label>Responsable déclarant</label><input type="text" id="acc-sig" placeholder="Prénom Nom — Gérant"></div>
+</div>
+</div>
+<div class="form-actions">
+<button class="btn-save" onclick="saveAccident()">💾 Enregistrer</button>
+<button class="btn-pdf" onclick="pdfAccident()">📄 PDF</button>
+</div>
+</div>
+
+<!-- FORMATIONS -->
+<div class="tab-pane" id="pane-training">
+<div class="date-bar"><div><div class="date-lbl">Registre des formations</div><div class="date-val" id="tr-date"></div></div></div>
+<div class="form-section">
+<div class="fs-head"><span class="fs-icon">🎓</span><span class="fs-title">Enregistrer une formation</span><span class="fs-badge">Annuel</span></div>
+<div class="fs-body">
+<div class="form-row">
+<div class="fg"><label>Nom du salarié</label><input type="text" id="tr-name" placeholder="Jean Dupont"></div>
+<div class="fg"><label>Poste</label><input type="text" id="tr-poste" placeholder="Cuisinier, serveur…"></div>
+</div>
+<div class="form-row">
+<div class="fg"><label>Type de formation</label><select id="tr-type"><option>Hygiène alimentaire (HACCP)</option><option>Sécurité incendie</option><option>Premiers secours (SST)</option><option>Habilitation électrique</option><option>Gestes et postures</option><option>Autre</option></select></div>
+<div class="fg"><label>Organisme de formation</label><input type="text" id="tr-org" placeholder="AFPA, CCI…"></div>
+</div>
+<div class="form-row">
+<div class="fg"><label>Date de la formation</label><input type="date" id="tr-date-input"></div>
+<div class="fg"><label>Date d'expiration</label><input type="date" id="tr-expiry"></div>
+</div>
+<div class="form-row">
+<div class="fg"><label>Durée (heures)</label><input type="number" id="tr-dur" placeholder="7" min="0"></div>
+<div class="fg"><label>Résultat</label><select id="tr-result"><option>Réussite — Attestation obtenue</option><option>En cours</option><option>À renouveler</option></select></div>
+</div>
+</div>
+</div>
+<div class="form-section">
+<div class="fs-head"><span class="fs-icon">📋</span><span class="fs-title">Formations enregistrées</span></div>
+<div class="fs-body" id="tr-list-wrap"><div style="color:var(--muted);font-size:.8rem">Chargement…</div></div>
+</div>
+<div class="form-actions">
+<button class="btn-save" onclick="saveTraining()">💾 Enregistrer formation</button>
+<button class="btn-pdf" onclick="pdfTraining()">📄 PDF récapitulatif</button>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+const SB_URL='https://jyjazvtkitjskcpnaaxl.supabase.co';
+const SB_KEY='sb_publishable_eektTeDJs2YlTL1iA1LI1w_2kipZYT9';
+
+async function sb(path,opts={}){
+const r=await fetch(SB_URL+'/rest/v1/'+path,{...opts,headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':opts.prefer||'return=representation',...(opts.headers||{})}});
+const t=await r.text();
+if(!r.ok)throw new Error(t);
+return t?JSON.parse(t):[];
+}
+const sbGet=(t,q='')=>sb(t+'?'+q);
+const sbPost=(t,d)=>sb(t,{method:'POST',body:JSON.stringify(d)});
+const sbDel=(t,q)=>sb(t+'?'+q,{method:'DELETE',prefer:'return=minimal'});
+
+let cu=null;
+const cks={};
+
+function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page-'+id).classList.add('active');window.scrollTo({top:0,behavior:'smooth'})}
+function goHome(){if(!cu)showPage('landing')}
+
+async function doLogin(){
+const u=document.getElementById('lu').value.trim(),p=document.getElementById('lp').value.trim();
+try{
+const rows=await sbGet('users',`login=eq.${encodeURIComponent(u)}&pass=eq.${encodeURIComponent(p)}`);
+if(!rows||!rows.length){document.getElementById('lerr').style.display='block';return}
+document.getElementById('lerr').style.display='none';
+cu=rows[0];
+document.getElementById('btn-login').style.display='none';
+document.getElementById('btn-logout').style.display='inline';
+document.getElementById('nav-user').textContent=cu.name;
+document.getElementById('nav-user').style.display='inline';
+if(cu.role==='admin'){showPage('admin');renderAdmin()}else{showPage('app');initApp()}
+}catch(e){showToast('Erreur de connexion — vérifiez votre connexion internet')}
+}
+
+function logout(){
+cu=null;
+document.getElementById('btn-login').style.display='inline';
+document.getElementById('btn-logout').style.display='none';
+document.getElementById('nav-user').style.display='none';
+document.getElementById('lu').value='';document.getElementById('lp').value='';
+showPage('landing');
+}
+
+async function renderAdmin(){
+try{
+const clients=await sbGet('users','role=eq.client');
+const mrr=clients.length*49;
+document.getElementById('k1').textContent=clients.length;
+document.getElementById('k2').textContent=mrr+'€';
+document.getElementById('k3').textContent=(mrr*12)+'€';
+const now=new Date();
+const from=new Date(now.getFullYear(),now.getMonth(),1).toISOString();
+const regs=await sbGet('registers','created_at=gte.'+from);
+document.getElementById('k4').textContent=regs.length;
+const list=document.getElementById('clients-list');
+if(!clients.length){list.innerHTML='<div class="empty-r">Aucun client — ajoutez votre premier établissement</div>';return}
+list.innerHTML=clients.map(c=>`<div class="tbl-r"><div><div class="tr-name">${c.name}</div><div class="tr-creds">${c.login} / ${c.pass}</div></div><div class="tr-creds">${c.login}</div><span class="plan-b">49€/mois</span><button class="btn-rm" onclick="removeClient('${c.login}')">Supprimer</button></div>`).join('');
+}catch(e){document.getElementById('clients-list').innerHTML='<div class="empty-r">Erreur de chargement</div>'}
+}
+
+async function addClient(){
+const name=document.getElementById('new-name').value.trim(),login=document.getElementById('new-login').value.trim(),pass=document.getElementById('new-pass').value.trim();
+if(!name||!login||!pass){showToast('Remplis tous les champs');return}
+try{await sbPost('users',{login,pass,name,plan:'essential',role:'client'});document.getElementById('new-name').value='';document.getElementById('new-login').value='';document.getElementById('new-pass').value='';renderAdmin();showToast('✅ Client ajouté')}
+catch(e){showToast('Erreur — identifiant peut-être déjà utilisé')}
+}
+
+async function removeClient(login){
+if(!confirm('Supprimer ce client ?'))return;
+try{await sbDel('users','login=eq.'+encodeURIComponent(login));await sbDel('registers','user_login=eq.'+encodeURIComponent(login));renderAdmin();showToast('Client supprimé')}
+catch(e){showToast('Erreur lors de la suppression')}
+}
+
+function initApp(){
+const now=new Date();
+document.getElementById('client-name').textContent=cu.name;
+document.getElementById('client-date').textContent=now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+const ds=now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+['haccp-date','fire-date','acc-date','tr-date'].forEach(id=>document.getElementById(id).textContent=ds);
+document.getElementById('haccp-name').textContent=cu.name;
+const t=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+if(document.getElementById('sig2'))document.getElementById('sig2').value=t;
+const d=now.toISOString().slice(0,10);
+['fire-sig-date','acc-date-input','tr-date-input'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=d});
+loadDash();loadTrainings();
+}
+
+function switchTab(name){
+document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+document.getElementById('tab-'+name).classList.add('active');
+document.getElementById('pane-'+name).classList.add('active');
+window.scrollTo({top:0});
+}
+
+async function loadDash(){
+try{
+const now=new Date();
+const from=new Date(now.getFullYear(),now.getMonth(),1).toISOString();
+const regs=await sbGet('registers','user_login=eq.'+encodeURIComponent(cu.login)+'&created_at=gte.'+from+'&order=created_at.desc');
+const all=await sbGet('registers','user_login=eq.'+encodeURIComponent(cu.login)+'&order=created_at.desc&limit=5');
+const fires=await sbGet('fire_registers','user_login=eq.'+encodeURIComponent(cu.login)+'&order=created_at.desc&limit=1');
+const accs=await sbGet('accident_registers','user_login=eq.'+encodeURIComponent(cu.login)+'&order=created_at.desc&limit=1');
+const trs=await sbGet('training_registers','user_login=eq.'+encodeURIComponent(cu.login)+'&order=created_at.desc&limit=1');
+document.getElementById('ck1').textContent=regs.length;
+document.getElementById('rs2').textContent=fires.length+' enregistrement(s)';
+document.getElementById('rs3').textContent=accs.length+' incident(s)';
+document.getElementById('rs4').textContent=trs.length+' formation(s)';
+if(all.length){const last=all[0];const d=new Date(last.created_at);document.getElementById('ck2').textContent=d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'});document.getElementById('ck2s').textContent=last.conformity||'Enregistré';document.getElementById('ck3').textContent=last.conformity==='Conforme'?'✅':'⚠️';document.getElementById('ck3s').textContent=last.conformity||'–'}
+const hl=document.getElementById('history-list');
+if(!all.length){hl.innerHTML='<div class="empty-r">Aucun registre HACCP — commencez maintenant</div>';return}
+hl.innerHTML=all.map(r=>{const d=new Date(r.created_at);const ds=d.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});const ok=r.conformity==='Conforme';return`<div class="hc-row"><div><div class="hc-title">HACCP — ${ds}</div><div class="hc-date">Validé par ${r.signed_by||'–'}</div></div><span class="hc-badge ${ok?'hcb-ok':'hcb-w'}">${r.conformity||'Enregistré'}</span></div>`}).join('');
+}catch(e){console.error(e)}
+}
+
+function chkT(input,min,max){const v=parseFloat(input.value);input.className='';if(input.value==='')return;if(v>=min&&v<=max)input.classList.add('t-ok');else if(Math.abs(v-(v<min?min:max))<=2)input.classList.add('t-w');else input.classList.add('t-bad')}
+function tog(el,id){el.classList.toggle('on');cks[id]=el.classList.contains('on');document.getElementById(id).textContent=cks[id]?'✓':''}
+function getConf(){const t1=parseFloat(document.getElementById('t1').value),t3=parseFloat(document.getElementById('t3').value);return(!isNaN(t1)&&(t1<0||t1>4))||(!isNaN(t3)&&t3>-18)?'Non conforme':'Conforme'}
+
+async function saveHACCP(){
+const sig=document.getElementById('sig1').value.trim();
+if(!sig){showToast('⚠️ Ajoutez le nom du responsable');return}
+try{
+await sbPost('registers',{user_login:cu.login,conformity:getConf(),signed_by:sig,signed_at:document.getElementById('sig2').value,temps:{t1:document.getElementById('t1').value,t2:document.getElementById('t2').value,t3:document.getElementById('t3').value,t4:document.getElementById('t4').value,notes:document.getElementById('t-notes').value},cleaning:{checks:{...cks},notes:document.getElementById('c-notes').value},delivery:{supplier:document.getElementById('l1').value,status:document.getElementById('l2').value,notes:document.getElementById('l-notes').value},notes:document.getElementById('sig3').value});
+showToast('✅ Registre HACCP enregistré');loadDash();setTimeout(()=>switchTab('home'),1200);
+}catch(e){showToast('Erreur lors de l\'enregistrement')}
+}
+
+async function saveFire(){
+const sig=document.getElementById('fire-sig').value.trim();
+if(!sig){showToast('⚠️ Ajoutez le nom du responsable');return}
+try{await sbPost('fire_registers',{user_login:cu.login,data:{checks:{...cks},nb_exts:document.getElementById('fire-nb').value,exo_date:document.getElementById('fire-exo-date').value,exo_dur:document.getElementById('fire-exo-dur').value,notes:document.getElementById('fire-notes').value,sig,sig_date:document.getElementById('fire-sig-date').value}});showToast('✅ Registre incendie enregistré');loadDash();setTimeout(()=>switchTab('home'),1200)}catch(e){showToast('Erreur')}
+}
+
+async function saveAccident(){
+const name=document.getElementById('acc-name').value.trim();
+if(!name){showToast('⚠️ Ajoutez le nom du salarié');return}
+try{await sbPost('accident_registers',{user_login:cu.login,data:{name,poste:document.getElementById('acc-poste').value,date:document.getElementById('acc-date-input').value,time:document.getElementById('acc-time').value,desc:document.getElementById('acc-desc').value,bless:document.getElementById('acc-bless').value,corps:document.getElementById('acc-corps').value,soins:document.getElementById('acc-soins').value,arret:document.getElementById('acc-arret').value,mesures:document.getElementById('acc-mesures').value,sig:document.getElementById('acc-sig').value}});showToast('✅ Accident enregistré');loadDash();setTimeout(()=>switchTab('home'),1200)}catch(e){showToast('Erreur')}
+}
+
+async function saveTraining(){
+const name=document.getElementById('tr-name').value.trim();
+if(!name){showToast('⚠️ Ajoutez le nom du salarié');return}
+try{await sbPost('training_registers',{user_login:cu.login,data:{name,poste:document.getElementById('tr-poste').value,type:document.getElementById('tr-type').value,org:document.getElementById('tr-org').value,date:document.getElementById('tr-date-input').value,expiry:document.getElementById('tr-expiry').value,dur:document.getElementById('tr-dur').value,result:document.getElementById('tr-result').value}});showToast('✅ Formation enregistrée');loadTrainings();['tr-name','tr-poste','tr-org','tr-dur'].forEach(id=>document.getElementById(id).value='')}catch(e){showToast('Erreur')}
+}
+
+async function loadTrainings(){
+try{
+const rows=await sbGet('training_registers','user_login=eq.'+encodeURIComponent(cu.login)+'&order=created_at.desc&limit=20');
+const wrap=document.getElementById('tr-list-wrap');
+if(!rows.length){wrap.innerHTML='<div style="color:var(--muted);font-size:.8rem">Aucune formation enregistrée</div>';return}
+wrap.innerHTML=`<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.78rem"><tr style="background:var(--bg)"><th style="padding:7px 9px;text-align:left;border:1px solid var(--border)">Salarié</th><th style="padding:7px 9px;text-align:left;border:1px solid var(--border)">Formation</th><th style="padding:7px 9px;text-align:left;border:1px solid var(--border)">Date</th><th style="padding:7px 9px;text-align:left;border:1px solid var(--border)">Expiration</th><th style="padding:7px 9px;text-align:left;border:1px solid var(--border)">Résultat</th></tr>${rows.map(r=>`<tr><td style="padding:7px 9px;border:1px solid var(--border)">${r.data.name}</td><td style="padding:7px 9px;border:1px solid var(--border)">${r.data.type}</td><td style="padding:7px 9px;border:1px solid var(--border);font-family:'DM Mono',monospace">${r.data.date||'–'}</td><td style="padding:7px 9px;border:1px solid var(--border);font-family:'DM Mono',monospace">${r.data.expiry||'–'}</td><td style="padding:7px 9px;border:1px solid var(--border)">${r.data.result}</td></tr>`).join('')}</table></div>`;
+}catch(e){}
+}
+
+function openPDF(html){const blob=new Blob([html],{type:'text/html'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='registre-haccpro.html';a.click();URL.revokeObjectURL(url)}
+
+function pdfBase(title,content){const now=new Date();const date=now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});return`<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;margin:0;padding:20px;font-size:12px}.hd{display:flex;justify-content:space-between;padding-bottom:12px;border-bottom:3px solid #0d6efd;margin-bottom:16px}.logo{font-size:15px;font-weight:800;color:#0d6efd}.sec{margin-bottom:14px}.st{font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#6c757d;margin-bottom:7px;padding-bottom:4px;border-bottom:1px solid #e9ecef}table{width:100%;border-collapse:collapse}th,td{padding:6px 9px;border:1px solid #e9ecef;font-size:11px}th{background:#f8f9fa;text-align:left}.ok{color:#198754;font-weight:700}.bad{color:#dc3545;font-weight:700}.ft{margin-top:20px;padding-top:10px;border-top:1px solid #e9ecef;display:flex;justify-content:space-between;font-size:9px;color:#adb5bd}@media print{@page{margin:8mm}}</style></head><body><div class="hd"><div><div class="logo">HACCPro</div><div style="font-size:11px;color:#6c757d">${cu?.name}</div></div><div style="text-align:right;font-size:11px;color:#6c757d">${title}<br>${date}</div></div>${content}<div class="ft"><span>HACCPro · haccpro.fr</span><span>${date}</span></div><script>window.onload=function(){window.print()}<\/script></body></html>`}
+
+function pdfHACCP(){
+const t1=document.getElementById('t1').value,t2=document.getElementById('t2').value,t3=document.getElementById('t3').value,t4=document.getElementById('t4').value;
+const cl=['Cuisine','Ustensiles','Poubelles','Sanitaires','Plans de travail'].map((l,i)=>{const ok=cks['c'+(i+1)];return`<tr><td>${l}</td><td class="${ok?'ok':'bad'}">${ok?'✅ Fait':'❌ Non fait'}</td></tr>`}).join('');
+openPDF(pdfBase('Registre HACCP',`<div class="sec"><div class="st">🌡 Températures</div><table><tr><th>Équipement</th><th>Température</th><th>Norme</th><th>Conformité</th></tr><tr><td>Frigo viandes</td><td>${t1||'–'}°C</td><td>0-4°C</td><td class="${t1&&parseFloat(t1)>=0&&parseFloat(t1)<=4?'ok':'bad'}">${t1?(parseFloat(t1)>=0&&parseFloat(t1)<=4?'✅ OK':'❌ Hors norme'):'–'}</td></tr><tr><td>Frigo légumes</td><td>${t2||'–'}°C</td><td>0-8°C</td><td class="${t2&&parseFloat(t2)>=0&&parseFloat(t2)<=8?'ok':'bad'}">${t2?(parseFloat(t2)>=0&&parseFloat(t2)<=8?'✅ OK':'❌ Hors norme'):'–'}</td></tr><tr><td>Congélateur</td><td>${t3||'–'}°C</td><td>≤-18°C</td><td class="${t3&&parseFloat(t3)<=-18?'ok':'bad'}">${t3?(parseFloat(t3)<=-18?'✅ OK':'❌ Hors norme'):'–'}</td></tr><tr><td>Frigo boissons</td><td>${t4||'–'}°C</td><td>0-8°C</td><td class="${t4&&parseFloat(t4)>=0&&parseFloat(t4)<=8?'ok':'bad'}">${t4?(parseFloat(t4)>=0&&parseFloat(t4)<=8?'✅ OK':'❌ Hors norme'):'–'}</td></tr></table></div><div class="sec"><div class="st">🧼 Nettoyage</div><table><tr><th>Tâche</th><th>Réalisée</th></tr>${cl}</table></div><div class="sec"><div class="st">📦 Livraison</div><table><tr><th>Fournisseur</th><th>Conformité</th></tr><tr><td>${document.getElementById('l1').value||'–'}</td><td>${document.getElementById('l2').value||'–'}</td></tr></table></div><div class="sec"><div class="st">✍️ Validation</div><table><tr><th>Responsable</th><th>Heure</th><th>Conformité globale</th></tr><tr><td>${document.getElementById('sig1').value||'–'}</td><td>${document.getElementById('sig2').value||'–'}</td><td class="${getConf()==='Conforme'?'ok':'bad'}">${getConf()}</td></tr></table>${document.getElementById('sig3').value?`<p style="margin-top:7px;font-size:11px;color:#555">Obs: ${document.getElementById('sig3').value}</p>`:''}</div>`))
+}
+
+function pdfFire(){
+const fl=['Extincteurs accessibles','Date vérif. valide','Manomètre vert','Issues dégagées','Éclairage OK','Plan affiché'].map((l,i)=>{const ok=cks['f'+(i+1)];return`<tr><td>${l}</td><td class="${ok?'ok':'bad'}">${ok?'✅ OK':'❌ Non vérifié'}</td></tr>`}).join('');
+openPDF(pdfBase('Registre Sécurité Incendie',`<div class="sec"><div class="st">🧯 Contrôles</div><table><tr><th>Élément</th><th>Résultat</th></tr>${fl}<tr><td>Nb extincteurs vérifiés</td><td>${document.getElementById('fire-nb').value||'–'}</td></tr></table></div><div class="sec"><div class="st">🏃 Exercice évacuation</div><table><tr><th>Dernier exercice</th><th>Durée</th></tr><tr><td>${document.getElementById('fire-exo-date').value||'–'}</td><td>${document.getElementById('fire-exo-dur').value||'–'} min</td></tr></table></div><div class="sec"><div class="st">✍️ Validation</div><table><tr><th>Responsable</th><th>Date</th></tr><tr><td>${document.getElementById('fire-sig').value||'–'}</td><td>${document.getElementById('fire-sig-date').value||'–'}</td></tr></table>${document.getElementById('fire-notes').value?`<p style="margin-top:7px;font-size:11px;color:#555">Obs: ${document.getElementById('fire-notes').value}</p>`:''}</div>`))
+}
+
+function pdfAccident(){
+openPDF(pdfBase('Registre Accidents du Travail',`<div class="sec"><div class="st">🩹 Déclaration</div><table><tr><th>Salarié</th><td>${document.getElementById('acc-name').value||'–'}</td><th>Poste</th><td>${document.getElementById('acc-poste').value||'–'}</td></tr><tr><th>Date</th><td>${document.getElementById('acc-date-input').value||'–'}</td><th>Heure</th><td>${document.getElementById('acc-time').value||'–'}</td></tr><tr><th>Blessure</th><td>${document.getElementById('acc-bless').value||'–'}</td><th>Partie corps</th><td>${document.getElementById('acc-corps').value||'–'}</td></tr><tr><th>Soins</th><td>${document.getElementById('acc-soins').value||'–'}</td><th>Arrêt travail</th><td>${document.getElementById('acc-arret').value||'–'}</td></tr></table><p style="margin-top:7px;font-size:11px"><strong>Description:</strong> ${document.getElementById('acc-desc').value||'–'}</p><p style="margin-top:5px;font-size:11px"><strong>Mesures:</strong> ${document.getElementById('acc-mesures').value||'–'}</p><p style="margin-top:5px;font-size:11px"><strong>Déclarant:</strong> ${document.getElementById('acc-sig').value||'–'}</p></div>`))
+}
+
+async function pdfTraining(){
+try{const rows=await sbGet('training_registers','user_login=eq.'+encodeURIComponent(cu.login)+'&order=created_at.desc');const content=`<div class="sec"><div class="st">🎓 Formations du personnel</div><table><tr><th>Salarié</th><th>Poste</th><th>Formation</th><th>Organisme</th><th>Date</th><th>Expiration</th><th>Résultat</th></tr>${rows.map(r=>`<tr><td>${r.data.name}</td><td>${r.data.poste||'–'}</td><td>${r.data.type}</td><td>${r.data.org||'–'}</td><td style="font-family:monospace">${r.data.date||'–'}</td><td style="font-family:monospace">${r.data.expiry||'–'}</td><td>${r.data.result}</td></tr>`).join('')}</table></div>`;openPDF(pdfBase('Registre des Formations',content))}catch(e){showToast('Erreur PDF')}
+}
+
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000)}
+</script>
+</body>
+</html>
