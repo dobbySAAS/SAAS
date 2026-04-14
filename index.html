@@ -1845,6 +1845,101 @@ function pdfCleaningPlan(){if(!cleanPlan){showToast('Generez d\'abord le plan');
 
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;setTimeout(()=>{if(!localStorage.getItem('hp-pwa-dismissed'))document.getElementById('pwa-banner').classList.add('show');},3000);});
 function installPWA(){if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(()=>{deferredPrompt=null;document.getElementById('pwa-banner').classList.remove('show');localStorage.setItem('hp-pwa-dismissed','1');});}}
+// ============================================================
+// CORRECTIONS HACCPRO — À coller juste avant le </script> final
+// Ces fonctions remplacent les versions buggées
+// ============================================================
+
+// CORRECTION 1 — associateSite() avec validation complète
+async function associateSite(){
+  const site = document.getElementById('assoc-site').value.trim();
+  const grp = document.getElementById('assoc-grp').value.trim();
+  if(!site || !grp){ showToast('Remplis les deux champs'); return; }
+  try {
+    const checkSite = await sGet('users', 'login=eq.'+encodeURIComponent(site)+'&role=eq.client');
+    if(!checkSite.length){ showToast('❌ Site introuvable — vérifie le login client'); return; }
+    const checkGrp = await sGet('users', 'login=eq.'+encodeURIComponent(grp)+'&role=eq.groupe');
+    if(!checkGrp.length){ showToast('❌ Groupe introuvable — vérifie le login groupe'); return; }
+    await sPatch('users', 'login=eq.'+encodeURIComponent(site), { group_id: grp });
+    document.getElementById('assoc-site').value = '';
+    document.getElementById('assoc-grp').value = '';
+    showToast('✅ '+checkSite[0].name+' associé au groupe '+checkGrp[0].name);
+    loadGroups();
+    renderAdmin();
+  } catch(e) {
+    console.error('associateSite error:', e);
+    showToast('Erreur — vérifie que la colonne group_id existe dans Supabase (voir README)');
+  }
+}
+
+// CORRECTION 2 — generateCleaningPlan() sans appel direct Anthropic (CORS bloqué)
+async function generateCleaningPlan(){
+  const type = document.getElementById('clean-type').value;
+  const staff = document.getElementById('clean-staff').value;
+  const notes = document.getElementById('clean-notes').value;
+  
+  document.getElementById('ai-loader').classList.add('show');
+  document.getElementById('ai-out').classList.remove('show');
+  document.getElementById('ai-placeholder').style.display = 'none';
+  
+  const prompt = `Tu es un expert HACCP en France. Génère un plan de nettoyage hebdomadaire détaillé et pratique pour:\nType d'établissement: ${type}\nPersonnes en cuisine: ${staff}\nParticularités: ${notes||'Aucune'}\n\nFormat: Lundi à Dimanche, pour chaque jour:\n- Zones à nettoyer\n- Produits recommandés (avec dilution si besoin)\n- Fréquence (quotidien/hebdo)\nSois concis, pratique, utilise des emojis pour rendre ça lisible.`;
+
+  let text = '';
+
+  // Essai via Supabase Edge Function (clé API cachée côté serveur)
+  try {
+    const r = await fetch('https://jyjazvtkitjskcpnaaxl.supabase.co/functions/v1/claude-proxy', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer sb_publishable_eektTeDJs2YlTL1iA1LI1w_2kipZYT9'
+      },
+      body: JSON.stringify({ prompt })
+    });
+    if (r.ok) {
+      const d = await r.json();
+      text = d.text || d.content || '';
+    }
+  } catch(edgeErr) {
+    console.warn('Edge Function indisponible, plan standard utilisé');
+  }
+
+  // Fallback: plan statique détaillé si Edge Function non configurée
+  if (!text) {
+    text = generateStaticCleaningPlan(type, staff);
+  }
+
+  cleanPlan = text;
+  document.getElementById('ai-out').textContent = text;
+  document.getElementById('ai-out').classList.add('show');
+  document.getElementById('btn-clean-pdf').style.display = 'inline';
+  
+  const isStatic = text.startsWith('⚙️');
+  showToast(isStatic ? '📋 Plan standard généré' : '✅ Plan IA généré');
+  
+  const key = 'hp-ob-' + cu.login;
+  const done = JSON.parse(localStorage.getItem(key)||'[]');
+  if(!done.includes('clean')){ done.push('clean'); localStorage.setItem(key, JSON.stringify(done)); }
+  
+  document.getElementById('ai-loader').classList.remove('show');
+}
+
+// Plan statique de secours (affiché quand Edge Function non configurée)
+function generateStaticCleaningPlan(type, staff) {
+  const staffNote = staff === '1 à 2'
+    ? 'Pour une petite équipe, répartissez ces tâches entre vous.'
+    : 'Assignez chaque zone à un responsable fixe.';
+  
+  const specific = {
+    'Pizzeria': `🍕 LUNDI\nFour à pizza : dégraissage complet intérieur/extérieur\nPlans de travail + pétrissoirs : désinfection\n🧴 Dégraissant professionnel alimentaire (dilution 1/20)\n\n❄️ MARDI\nFrigos/congélateurs : nettoyage intérieur + vérification DLC\nPoubelles : vidage + désinfection\n🧴 Désinfectant froid alimentaire (dilution 1/50)\n\n🧹 MERCREDI\nSol cuisine + réserve : lavage + désinfection\nSiphons : détartrage anti-odeurs\n🧴 Détergent sol alimentaire\n\n🍽 JEUDI\nSpatules, rouleaux, moules : trempage désinfectant 30 min\nBacs de préparation : nettoyage approfondi\n🧴 Désinfectant en trempage\n\n🔥 VENDREDI\nHottes + filtres à graisse : dégraissage hebdomadaire\nRobinets + joints : détartrage\n🧴 Dégraissant puissant (dilution 1/10)\n\n🧽 SAMEDI\nGrand nettoyage complet cuisine\nPoignées, interrupteurs, vitres : désinfection\n🧴 Désinfectant multifonctions\n\n✅ DIMANCHE\nVérification générale + contrôle stock produits`,
+
+    'Boulangerie / Pâtisserie': `🥐 LUNDI\nFours : dégraissage + nettoyage résidus farine\nPétrin + laminoir : démontage + désinfection pièces\n🧴 Dégraissant alimentaire (dilution 1/20)\n\n❄️ MARDI\nChambres froides : nettoyage intérieur + DLC\nPoubelles + cartons : évacuation + désinfection\n🧴 Désinfectant froid alimentaire\n\n🧹 MERCREDI\nSol laboratoire + boutique : lavage complet\nÉvacuations : nettoyage anti-colmatage\n🧴 Détergent sol alimentaire\n\n🍽 JEUDI\nMoules + plaques cuisson : trempage dégraissant\nBacs à pâte + contenants : désinfection\n🧴 Désinfectant trempage\n\n💨 VENDREDI\nHottes + ventilations : nettoyage filtres\nÉtagères de stockage : dépoussiérage + désinfection\n🧴 Dégraissant professionnel\n\n🧽 SAMEDI\nNettoyage complet laboratoire\nPortes + vitrine + comptoir : désinfection\n🧴 Désinfectant multifonctions\n\n✅ DIMANCHE\nVérification + préparation semaine + contrôle DLC`,
+  };
+
+  const plan = specific[type] || `🧽 LUNDI\nPlans de travail + équipements : nettoyage + désinfection\n🧴 Désinfectant alimentaire (ex: Ecolab, dilution 1/50)\n\n❄️ MARDI\nFrigos/congélateurs : nettoyage intérieur + contrôle DLC\nPoubelles : vidage + désinfection\n🧴 Désinfectant froid alimentaire\n\n🧹 MERCREDI\nSol cuisine + réserve : lavage + désinfection\nSiphons + évacuations : nettoyage\n🧴 Détergent sol alimentaire\n\n🍳 JEUDI\nÉquipements cuisson (four, plaques, friteuse) : dégraissage\nMatériel de préparation : trempage désinfectant\n🧴 Dégraissant puissant (dilution 1/10)\n\n💨 VENDREDI\nHottes + filtres : dégraissage hebdomadaire\nÉtagères + stockages : nettoyage + désinfection\n🧴 Dégraissant professionnel\n\n🧽 SAMEDI\nGrand nettoyage hebdomadaire complet\nSurfaces de contact (poignées, boutons) : désinfection\n🧴 Désinfectant multifonctions\n\n✅ DIMANCHE\nVérification générale + préparation semaine suivante`;
+
+  return `⚙️ Plan standard — ${type} (${staff} personne(s))\n${staffNote}\n\n${plan}\n\n💡 Pour un vrai plan IA personnalisé : créez la Supabase Edge Function "claude-proxy" (voir README ci-dessous).`;
+}
 </script>
 </body>
 </html>
